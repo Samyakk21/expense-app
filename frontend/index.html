@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Expense Splitter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h1>Expense Splitter</h1>
+    <p class="subtitle">Simple group expense tracking</p>
+  </header>
+
+  <div id="toast"></div>
+
+  <!-- Add User -->
+  <section class="card">
+    <h2>Add User</h2>
+    <div class="grid">
+      <input id="name" type="text" placeholder="Name" />
+    </div>
+    <button class="primary" onclick="addUser()">Add User</button>
+  </section>
+
+  <!-- Add Expense -->
+
+  <input id="description" placeholder="Description">
+  <section class="card">
+    <h2>Add Expense</h2>
+
+    <div class="grid">
+      <select id="payer"></select>
+      <input id="amount" type="number" placeholder="Amount" />
+    </div>
+
+    <h3>Splits</h3>
+    <div id="splits"></div>
+
+    <button class="secondary" onclick="addSplit()">+ Add Split</button>
+    <button class="primary" onclick="addExpense()">Submit Expense</button>
+  </section>
+
+  <!-- Expenses -->
+  <section class="card">
+    <h2>Expenses</h2>
+    <div id="expenseList"></div>
+  </section>
+
+  <!-- Actions -->
+  <section class="card">
+    <h2>Results</h2>
+    <div class="actions">
+      <button onclick="getBalances()">Balances</button>
+      <button onclick="getSettlements()">Settlements</button>
+    </div>
+    <pre id="output"></pre>
+  </section>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
