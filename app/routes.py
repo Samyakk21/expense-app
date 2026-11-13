@@ -1,21 +1,20 @@
-"""API routes for the expense splitter toolkit (Vercel serverless).
+"""API routes for the expense splitter toolkit.
 
-Core business logic is delegated to the same ExpenseManager / balances /
-simplify_debts modules used by the legacy code.
+Persistence is delegated to ``app.store`` (Supabase when configured, otherwise
+in-memory). The pure domain logic in ``app.balances`` and ``app.simplify_debts``
+is used unchanged.
 """
 
 from typing import Dict, List
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from app.manager import ExpenseManager
+from app import store
 from app.balances import compute_balances
 from app.simplify_debts import simplify_debts
 
 router = APIRouter()
-
-# Single in-memory manager (same design as original legacy api.py)
-manager = ExpenseManager()
 
 
 # ---------------------------------------------------------------------------
@@ -62,7 +61,7 @@ class SettlementResponse(BaseModel):
 @router.post("/users", response_model=UserResponse, status_code=201)
 def add_user(user: UserRequest):
     try:
-        manager.add_user(user.user_id, user.name)
+        store.add_user(user.user_id, user.name)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     return {"id": user.user_id, "name": user.name}
@@ -70,20 +69,17 @@ def add_user(user: UserRequest):
 
 @router.get("/users", response_model=List[UserResponse])
 def list_users():
-    return [{"id": u.id, "name": u.name} for u in manager.list_users()]
+    return [{"id": u.id, "name": u.name} for u in store.list_users()]
 
 
 @router.delete("/users/{user_id}", status_code=204)
 def delete_user(user_id: int):
-    if user_id not in manager.users:
-        raise HTTPException(status_code=404, detail="User not found")
-    for exp in manager.list_expenses():
-        if exp.payer.id == user_id or any(u.id == user_id for u in exp.splits):
-            raise HTTPException(
-                status_code=400,
-                detail="Cannot delete user with associated expenses",
-            )
-    del manager.users[user_id]
+    try:
+        store.delete_user(user_id)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     return None
 
 
@@ -93,7 +89,7 @@ def delete_user(user_id: int):
 @router.post("/expenses", response_model=ExpenseResponse, status_code=201)
 def add_expense(expense: ExpenseRequest):
     try:
-        created = manager.add_expense(
+        created = store.add_expense(
             payer_id=expense.payer_id,
             amount=expense.amount,
             splits=expense.splits,
@@ -112,35 +108,33 @@ def add_expense(expense: ExpenseRequest):
 
 @router.get("/expenses", response_model=List[ExpenseResponse])
 def list_expenses():
-    out = []
-    for exp in manager.list_expenses():
-        out.append(
-            {
-                "id": exp.id,
-                "payer_id": exp.payer.id,
-                "payer_name": exp.payer.name,
-                "amount": exp.amount,
-                "splits": {str(u.id): amt for u, amt in exp.splits.items()},
-            }
-        )
-    return out
+    return [
+        {
+            "id": exp.id,
+            "payer_id": exp.payer.id,
+            "payer_name": exp.payer.name,
+            "amount": exp.amount,
+            "splits": {str(u.id): amt for u, amt in exp.splits.items()},
+        }
+        for exp in store.list_expenses()
+    ]
 
 
 @router.delete("/expenses/{expense_id}", status_code=204)
 def delete_expense(expense_id: int):
-    for idx, exp in enumerate(manager.expenses):
-        if exp.id == expense_id:
-            manager.expenses.pop(idx)
-            return None
-    raise HTTPException(status_code=404, detail="Expense not found")
+    try:
+        store.delete_expense(expense_id)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    return None
 
 
 # ---------------------------------------------------------------------------
-# Balances & settlements
+# Balances & settlements (core logic unchanged)
 # ---------------------------------------------------------------------------
 @router.get("/balances", response_model=List[BalanceResponse])
 def get_balances():
-    balances = compute_balances(manager.list_expenses())
+    balances = compute_balances(store.list_expenses())
     return [
         {"user": user.name, "balance": round(amount, 2)}
         for user, amount in balances.items()
@@ -149,7 +143,7 @@ def get_balances():
 
 @router.get("/settlements", response_model=List[SettlementResponse])
 def get_settlements():
-    balances = compute_balances(manager.list_expenses())
+    balances = compute_balances(store.list_expenses())
     transactions = simplify_debts(balances)
     return [
         {
