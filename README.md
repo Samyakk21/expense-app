@@ -147,3 +147,8 @@ Interactive API docs are available at `/docs` when the server is running.
 - Without Supabase credentials the app falls back to in-memory storage (the original behavior). On Vercel that fallback is ephemeral, so set the Supabase variables for a real deployment.
 - The original code is preserved unchanged in `legacy/` for reference.
 - For any change to the core splitting/settlement logic, please consult first.
+
+---
+
+Maintained by [@Samyakk21](https://github.com/Samyakk21). Questions and suggestions
+are welcome via GitHub issues.
