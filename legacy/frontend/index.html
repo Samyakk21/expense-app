@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Expense Splitter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="container">
+  <h1>Expense Splitter</h1>
+
+  <div id="toast"></div>
+
+  <!-- USER -->
+  <div class="card">
+    <h2>Add User</h2>
+    <div class="row">
+      <input id="user_id" type="number" placeholder="User ID" />
+      <input id="name" type="text" placeholder="Name" />
+    </div>
+    <button onclick="addUser()">Add User</button>
+  </div>
+
+  <!-- EXPENSE -->
+  <div class="card">
+    <h2>Add Expense</h2>
+
+    <div class="row">
+      <input id="payer_id" type="number" placeholder="Payer ID" />
+      <input id="amount" type="number" placeholder="Amount" />
+    </div>
+
+    <h3>Splits</h3>
+    <div id="splits"></div>
+
+    <div class="row">
+      <button onclick="addSplit()">+ Add Split</button>
+    </div>
+
+    <button class="primary" onclick="addExpense()">Submit Expense</button>
+  </div>
+
+  <!-- EXPENSE LIST -->
+  <div class="card">
+    <h2>Expenses</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Payer</th>
+          <th>Amount</th>
+          <th>Splits</th>
+        </tr>
+      </thead>
+      <tbody id="expenseTable"></tbody>
+    </table>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="card">
+    <h2>Actions</h2>
+    <div class="row">
+      <button onclick="getBalances()">Balances</button>
+      <button onclick="getSettlements()">Settlements</button>
+    </div>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="card">
+    <h2>Output</h2>
+    <pre id="output"></pre>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,8 +1,8 @@
-# balance.py
+"""Balance computation - core logic preserved from original."""
+
 
 def compute_balances(expenses):
-    """
-    Computes net balance for each user.
+    """Computes net balance for each user.
 
     Returns:
         dict {User: net_balance}
@@ -11,7 +11,6 @@ def compute_balances(expenses):
         +ve balance → user should receive money
         -ve balance → user owes money
     """
-
     balances = {}
 
     for expense in expenses:
@@ -22,7 +21,7 @@ def compute_balances(expenses):
         # Ensure payer is in balances
         if payer not in balances:
             balances[payer] = 0
-    
+
         # Payer initially paid full amount
         balances[payer] += amount
 
@@ -34,6 +33,3 @@ def compute_balances(expenses):
             balances[user] -= share
 
     return balances
-
-
-
