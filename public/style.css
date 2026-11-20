@@ -167,6 +167,8 @@ body {
   display: flex;
   flex: none;
   align-items: center;
+  justify-content:space-around;
+  min-width: 100vw;
 }
 
 .marquee__group span { padding: 0 1.25rem; }
