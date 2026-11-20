@@ -160,18 +160,16 @@ body {
 .marquee__track {
   display: flex;
   width: max-content;
-  animation: marquee-scroll 18s linear infinite;
+  animation: marquee-scroll 60s linear infinite;
 }
 
 .marquee__group {
   display: flex;
   flex: none;
   align-items: center;
-  justify-content:space-around;
-  min-width: 100vw;
 }
 
-.marquee__group span { padding: 0 1.25rem; }
+.marquee__group span { padding: 0 0.75rem; }
 .marquee__blue { color: var(--blue); }
 .marquee__orange { color: var(--orange); }
 .marquee__green { color: var(--green); }
