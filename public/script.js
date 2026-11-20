@@ -171,6 +171,8 @@ function populateUserSelects(users) {
   const current = payerSelect.value;
   payerSelect.innerHTML = users.map((u) => `<option value="${u.id}">${escapeHtml(u.name)}</option>`).join("");
   if (users.find((u) => u.id == current)) payerSelect.value = current;
+  // Keep the Add Expense split rows in sync with the people list.
+  rebuildSplits();
 }
 
 function rebuildSplits() {

@@ -5,9 +5,16 @@ Restyle the Expense Splitter web app into a **bold neubrutalist** design.
 Started: 2026-11-20
 Status: **COMPLETE — committed & pushed** (visual browser check unavailable in this environment)
 
+### Follow-up round (same task, user feedback)
+1. Straighten every tilted text box (cards, chips, tabs, stamps, badges, CTA, modal).
+2. Fix marquee: seamless continuous loop, larger/taller text, four colored phrases.
+3. Fix Add Expense split rows not refreshing when a person is added.
+
 ## Scope / hard constraints
 - Keep **all** functionality, data flow, API calls, element IDs, and handlers intact.
 - Change **only** markup structure where needed for styling, plus the CSS.
+  - Exception (explicitly requested in follow-up): `populateUserSelects()` now calls
+    `rebuildSplits()` so Add Expense reflects newly added people. No API/ID/handler changes.
 - **No new dependencies.** Plain CSS with custom properties (project does not use Tailwind).
 - Do **not** touch business logic (backend `app/*.py`, core splitting/settlement code).
 - Fonts loaded from Google Fonts via `<link>` in HTML — no JS dependencies.
@@ -15,9 +22,9 @@ Status: **COMPLETE — committed & pushed** (visual browser check unavailable in
 ## Files owned by this task
 | File | Change |
 |------|--------|
-| `public/style.css` | Full rewrite → ~195-rule neubrutalist design system with 37 custom properties |
-| `public/index.html` | Font `<link>`s, reusable burst SVG symbol, marquee strip, sticker SVGs on stat cards, `panel-title` tab classes, "SETTLE UP" loud CTA, modal a11y attributes |
-| `public/script.js` | **Markup-only** string edits (avatar initials, status stamps, empty-state copy, `all-square` message, verb label, tint class). No logic/API/ID/handler changes. |
+| `public/style.css` | Full rewrite → neubrutalist design system; follow-up: all text rotations removed, seamless larger marquee with 4 colors |
+| `public/index.html` | Font `<link>`s, burst SVG symbol, two-group seamless marquee, stat stickers, `panel-title` tabs, "SETTLE UP" CTA, modal a11y attributes |
+| `public/script.js` | Markup edits (avatars, stamps, copy, tints) **plus** the requested `rebuildSplits()` sync fix. No API/ID/handler changes. |
 | `STATE.md` | Created + maintained (this file) |
 
 ## Files explicitly NOT touched
@@ -61,30 +68,35 @@ Status: **COMPLETE — committed & pushed** (visual browser check unavailable in
 ## What changed visually
 - **Palette/type:** cream dotted-paper background, saturated flat fills, 3px ink borders,
   hard zero-blur shadows, Archivo Black + Space Grotesk + Space Mono from Google Fonts.
-- **Header:** yellow bar, rotated logo, green CONNECTED / pink OFFLINE sticker badge,
-  CSS-only black marquee strip.
-- **Stats:** four colored cards with hand-placed rotations, huge numbers, burst stickers,
-  hover lift to larger hard shadow.
+- **Header:** yellow bar, upright logo, green CONNECTED / pink OFFLINE sticker badge,
+  CSS-only black marquee with larger text in blue / orange / green / red phrases that
+  loops seamlessly and continuously (two identical groups, `translateX(-50%)`, linear infinite).
+- **Stats:** four colored cards, huge numbers, burst stickers, hover lift to larger hard shadow.
 - **Sections:** folder-tab titles (colored per section), white bordered cards.
 - **Controls:** chunky buttons with press-down active state and striped disabled state;
   uppercase mono labels; custom chevron selects; hidden number spinners; segmented
   Equal/Exact toggle; dashed split container with `:empty` placeholder.
-- **People:** rotating colored sticker chips with circular initial avatars; dashed empty state.
-- **Expenses:** row cards with avatar, bold payer/amount, mono split details, rotated
+- **People:** upright colored sticker chips with circular initial avatars; dashed empty state.
+- **Expenses:** row cards with avatar, bold payer/amount, mono split details, upright
   PENDING stamp, pink delete button; "NO EXPENSES. SUSPICIOUSLY CHEAP." empty state.
 - **Balances:** tinted ledger rows, bordered amount boxes, thick arrow with "owes" label,
-  oversized wiggling yellow SETTLE UP CTA, green "ALL SQUARE. GO HAVE A SAMOSA 🎉" state.
+  oversized yellow SETTLE UP CTA with an upright bounce, green "ALL SQUARE. GO HAVE A SAMOSA 🎉" state.
+- **All text boxes are now straight** — only the decorative arrowhead keeps a 45° rotation.
 - **Modal/toast:** 4px border modal over flat dark backdrop, colored header band, square ✕;
   bottom-right success/error toasts with stepped slide-in.
 - **Motion/a11y:** 80ms linear snaps, 60ms staggered section pop-in, visible focus rings,
   44px tap targets, status conveyed by text + shape, reduced-motion + dark-mode support.
-- **Responsive:** 4 → 2 → 1 column stats, stacked forms, reduced borders/shadows and no
-  rotations at ≤480px.
+- **Responsive:** 4 → 2 → 1 column stats, stacked forms, reduced borders/shadows at ≤480px.
 
 ## Design decisions
 - Provided design tokens used verbatim.
 - Optional marquee and burst stickers included (pure CSS/inline SVG, no deps).
 - Split-area placeholder via CSS `:empty::before` — no JS logic touched.
+- Marquee uses two identical `.marquee__group` blocks inside a `width: max-content` flex
+  track; `-50%` translation = one group, so the loop has no gap or restart.
+- Hover wiggle was replaced with a translate-only bounce so no text is ever tilted.
+- `rebuildSplits()` is called from `populateUserSelects()` — the smallest place that
+  covers add-person, delete-person, and initial load.
 - Status dot drawn with CSS `::before`; JS now sets just "Connected"/"Offline" text.
 - "Settle Up" visible label for the existing `loadSettlements()` handler (handler unchanged).
 - Dark mode inverts paper/border tokens while keeping saturated accents and black text on them.
@@ -94,8 +106,10 @@ Status: **COMPLETE — committed & pushed** (visual browser check unavailable in
 - [x] All inline handlers present and unchanged
 - [x] All API call paths unchanged
 - [x] JS syntax check passes (`node --check public/script.js`)
-- [x] CSS braces balanced (195 rules, 37 custom properties)
+- [x] CSS braces balanced; only remaining `rotate()` is the 45° arrowhead shape
 - [x] HTML tag structure balanced (`html.parser` validation)
+- [x] Marquee has two identical groups, `linear infinite`, no rotation, larger font/padding
+- [x] `populateUserSelects()` calls `rebuildSplits()`; add-person flow re-tested via API
 - [x] Only owned files changed (`git status`)
 - [x] Demo data round-trip through live FastAPI backend (4 users + 1 expense + settlements)
 - [x] Committed and pushed
@@ -108,4 +122,7 @@ Status: **COMPLETE — committed & pushed** (visual browser check unavailable in
 - 2026-11-20 — Applied markup-only edits to `public/script.js` (avatars, stamps, copy, tints).
 - 2026-11-20 — Verified IDs/handlers/APIs, JS syntax, HTML/CSS structure; seeded demo data
   against live backend successfully. Browser screenshot unavailable (no connected browser).
-- 2026-11-20 — Updated STATE.md and committed/pushed.
+- 2026-11-20 — Updated STATE.md and committed/pushed (`8efd67d`).
+- 2026-11-20 — Follow-up: straightened all tilted text, rebuilt marquee as seamless
+  4-color loop with bigger text, fixed Add Expense split rows on person add; verified
+  and pushed.
