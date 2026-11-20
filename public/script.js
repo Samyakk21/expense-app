@@ -50,10 +50,10 @@ function toast(msg, type = "success") {
 function setStatus(connected) {
   const el = document.getElementById("sync-status");
   if (connected) {
-    el.textContent = "● Connected";
+    el.textContent = "Connected";
     el.className = "status-badge status-connected";
   } else {
-    el.textContent = "● Disconnected";
+    el.textContent = "Offline";
     el.className = "status-badge status-disconnected";
   }
 }
@@ -92,13 +92,14 @@ function renderUsers(users) {
   const container = document.getElementById("users-list");
   container.innerHTML = "";
   if (!users.length) {
-    container.innerHTML = '<p class="empty-msg">No people added yet.</p>';
+    container.innerHTML = '<p class="empty-msg">👥 Nobody here yet</p>';
     return;
   }
   users.forEach((u) => {
     const chip = document.createElement("div");
     chip.className = "user-chip";
     chip.innerHTML = `
+      <span class="user-avatar" aria-hidden="true">${escapeHtml(u.name.trim().charAt(0).toUpperCase())}</span>
       <span>${escapeHtml(u.name)}</span>
       <button class="chip-remove" title="Remove" onclick="event.stopPropagation(); deleteUser(${u.id})">&times;</button>
     `;
@@ -273,7 +274,7 @@ function renderExpenses(expenses) {
   const container = document.getElementById("expenses-list");
   container.innerHTML = "";
   if (!expenses.length) {
-    container.innerHTML = '<p class="empty-msg">No expenses yet.</p>';
+    container.innerHTML = '<p class="empty-msg">🧾 No expenses. suspiciously cheap.</p>';
     return;
   }
   expenses.forEach((exp) => {
@@ -284,13 +285,15 @@ function renderExpenses(expenses) {
     const item = document.createElement("div");
     item.className = "expense-item";
     item.innerHTML = `
+      <span class="expense-avatar" aria-hidden="true">${escapeHtml(exp.payer_name.trim().charAt(0).toUpperCase())}</span>
       <div class="expense-info">
         <div class="expense-payer">${escapeHtml(exp.payer_name)} paid</div>
         <div class="expense-detail">Splits → ${escapeHtml(splitsText)}</div>
       </div>
       <div class="expense-amount">₹${parseFloat(exp.amount).toFixed(2)}</div>
+      <span class="status-stamp status-pending">Pending</span>
       <div class="expense-actions">
-        <button class="btn btn-outline" onclick="deleteExpense(${exp.id})" title="Delete">Delete</button>
+        <button class="btn btn-outline btn-danger" onclick="deleteExpense(${exp.id})" title="Delete">Delete</button>
       </div>
     `;
     container.appendChild(item);
@@ -368,7 +371,7 @@ function renderBalances(balances) {
     const cls = b.balance > 0.01 ? "positive" : b.balance < -0.01 ? "negative" : "zero";
     const sign = b.balance > 0 ? "+" : b.balance < 0 ? "−" : "";
     const item = document.createElement("div");
-    item.className = "balance-item";
+    item.className = `balance-item ${cls}`;
     item.innerHTML = `
       <span class="balance-name">${escapeHtml(b.user)}</span>
       <span class="balance-amount ${cls}">${sign}₹${Math.abs(b.balance).toFixed(2)}</span>
@@ -382,7 +385,7 @@ function renderSettlements(settlements) {
   const container = document.getElementById("balances-output");
   container.innerHTML = "";
   if (!settlements.length) {
-    container.innerHTML = '<p class="hint">Everyone is settled up! ✅</p>';
+    container.innerHTML = '<div class="all-square">All square. go have a samosa 🎉</div>';
     return;
   }
   const list = document.createElement("div");
@@ -393,6 +396,7 @@ function renderSettlements(settlements) {
     item.innerHTML = `
       <div class="settlement-flow">
         <span class="settlement-from">${escapeHtml(s.from_user)}</span>
+        <span class="settlement-verb">owes</span>
         <span class="settlement-arrow">→</span>
         <span class="settlement-to">${escapeHtml(s.to_user)}</span>
       </div>

@@ -3,16 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Expense Splitter Toolkit</title>
+  <title>Expense Splitter — Split it. Settle it. Stay friends.</title>
+
+  <!-- Google Fonts: chunky display + receipt mono. No JS dependencies. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <!-- Reusable burst sticker (decorative) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="burst" viewBox="0 0 100 100">
+      <path d="M50 2 L59 34 L90 18 L69 45 L98 57 L67 62 L82 94 L52 71 L29 97 L33 64 L2 69 L32 48 L9 19 L44 33 Z"
+            fill="#FFD93D" stroke="#0A0A0A" stroke-width="6" stroke-linejoin="round" />
+    </symbol>
+  </svg>
 
   <!-- Header -->
   <header class="app-header">
     <div class="header-content">
       <div class="brand">
-        <span class="brand-icon">💸</span>
+        <span class="brand-icon" aria-hidden="true">💸</span>
         <span class="brand-name">Expense Splitter</span>
       </div>
       <div class="header-actions">
@@ -21,26 +37,37 @@
     </div>
   </header>
 
+  <!-- Marquee strip (decorative, CSS-only) -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>SPLIT IT • SETTLE IT • STAY FRIENDS • SPLIT IT • SETTLE IT • STAY FRIENDS • SPLIT IT • SETTLE IT • STAY FRIENDS • SPLIT IT • SETTLE IT • STAY FRIENDS •</span>
+    </div>
+  </div>
+
   <div class="app-container">
 
     <!-- Toast -->
-    <div id="toast" class="toast"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <!-- Dashboard / Summary Cards -->
-    <section class="dashboard">
+    <section class="dashboard" aria-label="Summary">
       <div class="stat-card stat-total">
+        <svg class="stat-sticker" aria-hidden="true"><use href="#burst"></use></svg>
         <span class="stat-label">Total Expenses</span>
         <span class="stat-value" id="stat-expenses">0</span>
       </div>
       <div class="stat-card stat-amount">
+        <svg class="stat-sticker" aria-hidden="true"><use href="#burst"></use></svg>
         <span class="stat-label">Total Amount</span>
         <span class="stat-value" id="stat-amount">₹0.00</span>
       </div>
       <div class="stat-card stat-settled">
+        <svg class="stat-sticker" aria-hidden="true"><use href="#burst"></use></svg>
         <span class="stat-label">Settled</span>
         <span class="stat-value" id="stat-settled">₹0.00</span>
       </div>
       <div class="stat-card stat-pending">
+        <svg class="stat-sticker" aria-hidden="true"><use href="#burst"></use></svg>
         <span class="stat-label">Pending</span>
         <span class="stat-value" id="stat-pending">₹0.00</span>
       </div>
@@ -49,32 +76,32 @@
     <!-- Users Panel -->
     <section class="panel">
       <div class="panel-header">
-        <h2>People</h2>
+        <h2 class="panel-title">People</h2>
         <button class="btn btn-outline" onclick="openUserModal()">+ Add Person</button>
       </div>
       <div id="users-list" class="user-list">
         <!-- user chips injected here -->
-        <p class="empty-msg">No people added yet.</p>
+        <p class="empty-msg">Nobody here yet</p>
       </div>
     </section>
 
     <!-- Add Expense Panel -->
     <section class="panel">
       <div class="panel-header">
-        <h2>Add Expense</h2>
+        <h2 class="panel-title">Add Expense</h2>
       </div>
       <div class="expense-form">
         <div class="form-row">
-          <label>Paid by</label>
+          <label for="expense-payer">Paid by</label>
           <select id="expense-payer" required></select>
         </div>
         <div class="form-row">
-          <label>Amount (₹)</label>
+          <label for="expense-amount">Amount (₹)</label>
           <input type="number" id="expense-amount" step="0.01" min="0" placeholder="0.00" required />
         </div>
         <div class="form-row split-mode-row">
           <label>Split mode</label>
-          <div class="toggle-group">
+          <div class="toggle-group" role="group" aria-label="Split mode">
             <button type="button" class="toggle-btn active" id="mode-equal" onclick="setSplitMode('equal')">Equal</button>
             <button type="button" class="toggle-btn" id="mode-exact" onclick="setSplitMode('exact')">Exact</button>
           </div>
@@ -91,46 +118,46 @@
     <!-- Expenses List Panel -->
     <section class="panel">
       <div class="panel-header">
-        <h2>Expenses</h2>
+        <h2 class="panel-title">Expenses</h2>
         <button class="btn btn-outline" onclick="loadData()">Refresh</button>
       </div>
       <div id="expenses-list" class="expenses-list">
         <!-- expense rows injected here -->
-        <p class="empty-msg">No expenses yet.</p>
+        <p class="empty-msg">No expenses yet</p>
       </div>
     </section>
 
     <!-- Balances & Settlements Panel -->
     <section class="panel balances-panel">
       <div class="panel-header">
-        <h2>Balances &amp; Settlements</h2>
+        <h2 class="panel-title">Balances &amp; Settlements</h2>
         <div class="panel-actions">
           <button class="btn btn-outline" onclick="loadBalances()">Balances</button>
-          <button class="btn btn-primary" onclick="loadSettlements()">Settlements</button>
+          <button class="btn btn-primary btn-settle" onclick="loadSettlements()">Settle Up</button>
         </div>
       </div>
       <div id="balances-output" class="output-area">
-        <p class="hint">Click "Balances" or "Settlements" to compute.</p>
+        <p class="hint">Click "Balances" or "Settle Up" to compute.</p>
       </div>
     </section>
 
   </div>
 
   <!-- Add User Modal -->
-  <div id="user-modal" class="modal">
+  <div id="user-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="user-modal-title">
     <div class="modal-backdrop" onclick="closeUserModal()"></div>
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Add Person</h3>
-        <button class="btn-close" onclick="closeUserModal()">&times;</button>
+        <h3 id="user-modal-title">Add Person</h3>
+        <button class="btn-close" onclick="closeUserModal()" aria-label="Close">&times;</button>
       </div>
       <form id="user-form" onsubmit="handleAddUser(event)">
         <div class="form-row">
-          <label>Name</label>
+          <label for="modal-user-name">Name</label>
           <input type="text" id="modal-user-name" placeholder="e.g. Alice" required />
         </div>
         <div class="form-row">
-          <label>ID (optional, auto-assigned)</label>
+          <label for="modal-user-id">ID (optional, auto-assigned)</label>
           <input type="number" id="modal-user-id" placeholder="leave blank for auto" />
         </div>
         <div class="form-actions">
