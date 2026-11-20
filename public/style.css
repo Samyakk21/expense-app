@@ -1046,6 +1046,19 @@ input[type="number"]::-webkit-inner-spin-button {
   .app-header { padding: 0.75rem 1rem; }
   .app-container { margin-top: 1.25rem; gap: 20px; }
 
+  /* Status collapses to a dot-only sticker. The text stays in the DOM via
+     font-size:0 so screen readers still announce CONNECTED / OFFLINE. */
+  .status-badge {
+    font-size: 0;
+    gap: 0;
+    padding: 0;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    justify-content: center;
+  }
+  .status-badge::before { width: 12px; height: 12px; }
+
   .dashboard { grid-template-columns: 1fr; gap: 1rem; }
   .stat-card { min-height: 120px; }
   .stat-value { font-size: 1.9rem; }
