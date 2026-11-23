@@ -202,9 +202,11 @@ function rebuildSplits() {
       amountInput = `<input type="number" step="0.01" min="0" placeholder="0.00" class="split-amount" />`;
     }
     row.innerHTML = `
-      <select class="split-user">${users
-        .map((x) => `<option value="${x.id}" ${x.id === u.id ? "selected" : ""}>${escapeHtml(x.name)}</option>`)
-        .join("")}</select>
+      <div class="select-wrap select-wrap--small">
+        <select class="split-user">${users
+          .map((x) => `<option value="${x.id}" ${x.id === u.id ? "selected" : ""}>${escapeHtml(x.name)}</option>`)
+          .join("")}</select>
+      </div>
       ${amountInput}
       <button type="button" class="remove-split" onclick="this.closest('.split-row').remove()">&times;</button>
     `;
@@ -262,8 +264,9 @@ async function addExpense() {
     });
     toast("Expense added");
     document.getElementById("expense-amount").value = "";
+    // People and split rows are unchanged by an expense — leave them alone so
+    // several expenses can be entered back-to-back without re-adding anyone.
     loadExpenses();
-    loadUsers();
   } catch (err) {
     toast(err.message, "error");
   }
@@ -308,7 +311,6 @@ async function deleteExpense(expenseId) {
     await api(`/expenses/${expenseId}`, { method: "DELETE" });
     toast("Expense deleted");
     loadExpenses();
-    loadUsers();
   } catch (err) {
     toast(err.message, "error");
   }

@@ -9,6 +9,10 @@ Status: **COMPLETE — committed & pushed** (visual browser check unavailable in
 1. Straighten every tilted text box (cards, chips, tabs, stamps, badges, CTA, modal).
 2. Fix marquee: seamless continuous loop, larger/taller text, four colored phrases.
 3. Fix Add Expense split rows not refreshing when a person is added.
+4. Dense seamless marquee (6 repeats × 4 spans per group, 60s loop).
+5. Mobile status badge collapsed to a small dot-only sticker.
+6. Custom neubrutalist select (chunky arrow block) + keep people constant after
+   adding/deleting an expense so multiple expenses can be entered back-to-back.
 
 ## Scope / hard constraints
 - Keep **all** functionality, data flow, API calls, element IDs, and handlers intact.
@@ -126,3 +130,8 @@ Status: **COMPLETE — committed & pushed** (visual browser check unavailable in
 - 2026-11-20 — Follow-up: straightened all tilted text, rebuilt marquee as seamless
   4-color loop with bigger text, fixed Add Expense split rows on person add; verified
   and pushed.
+- 2026-11-23 — Dense 6× marquee, mobile dot-only status badge (then shrunk further).
+- 2026-11-23 — Replaced native select chrome with `.select-wrap` + solid arrow block
+  (payer and split selects); removed redundant `loadUsers()` calls from `addExpense()`
+  and `deleteExpense()` so the people list stays constant. Verified with jsdom:
+  two consecutive expenses with 3 people, no re-adding.
